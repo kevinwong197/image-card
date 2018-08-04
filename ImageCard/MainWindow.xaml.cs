@@ -17,8 +17,6 @@ using System.IO;
 using System.Windows.Interop;
 using System.Runtime.InteropServices;
 
-// apng, gif, lock to bottom
-
 namespace ImageCard
 {
     /// <summary>
@@ -26,15 +24,15 @@ namespace ImageCard
     /// </summary>
     public partial class MainWindow : Window
     {
-        private bool bFreeze;
-        private double delta = 4;
+        private bool _bFreeze;
+        private const double Delta = 4;
+
         public MainWindow()
         {
             InitializeComponent();
-            bFreeze = false;
+            _bFreeze = false;
             string[] args = Environment.GetCommandLineArgs();
             BitmapImage bitmap;
-            Console.WriteLine("ok");
             if (args.Length >= 2)
             {
                 Uri uri = new Uri(Path.GetFullPath(args[1]));
@@ -45,12 +43,11 @@ namespace ImageCard
                 bitmap = new BitmapImage(new Uri(@"images\init.png", UriKind.Relative));
             }
             image.Source = bitmap;
-
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (bFreeze)
+            if (_bFreeze)
                 return;
             if (e.ChangedButton == MouseButton.Left)
             {
@@ -74,19 +71,21 @@ namespace ImageCard
 
         private void MenuItem_Click_toggleFreeze(object sender, RoutedEventArgs e)
         {
-            if (bFreeze)
+            if (_bFreeze)
             {
-                bFreeze = false;
+                _bFreeze = false;
                 Application.Current.MainWindow.ResizeMode = ResizeMode.CanResize;
                 toggleFreeze.Header = "freeze";
             }
             else
             {
-                bFreeze = true;
+                _bFreeze = true;
                 Application.Current.MainWindow.ResizeMode = ResizeMode.NoResize;
                 toggleFreeze.Header = "unfreeze";
             }
         }
+
+        private void 
 
         private void Window_Drop(object sender, DragEventArgs e)
         {
@@ -100,36 +99,25 @@ namespace ImageCard
 
                 Application.Current.MainWindow.Height = bitmap.Height;
                 Application.Current.MainWindow.Width = bitmap.Width;
-
             }
         }
 
-        private void image_Loaded(object sender, RoutedEventArgs e)
+        private void Image_Loaded(object sender, RoutedEventArgs e)
         {
             Application.Current.MainWindow.Height = viewbox.ActualHeight;
             Application.Current.MainWindow.Width = viewbox.ActualWidth;
 
         }
 
-
         private IntPtr _handle;
         private void SetBounds(int left, int top, int width, int height)
         {
             if (_handle == IntPtr.Zero)
                 _handle = new WindowInteropHelper(this).Handle;
-
-            SetWindowPos(_handle, IntPtr.Zero, left, top, width, height, 0);
+            IntPtr d = BeginDeferWindowPos(1);
+            DeferWindowPos(d, _handle, IntPtr.Zero, left, top, width, height, 0x0008 | 0x0004 | 0x0010);
+            EndDeferWindowPos(d);
         }
-
-        [DllImport("user32")]
-        static extern bool SetWindowPos(
-            IntPtr hWnd,
-            IntPtr hWndInsertAfter,
-            int x,
-            int y,
-            int cx,
-            int cy,
-            uint uFlags);
 
         private void Window_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -137,15 +125,18 @@ namespace ImageCard
             double tmpH = 0;
             double tmpL = 0;
             double tmpW = 0;
-            if (e.Delta == 0)// should never occur
+            if (e.Delta == 0)
                 return;
             if ((this.Top <= 0) && e.Delta > 0)
                 return;
 
-            tmpT = Application.Current.MainWindow.Top - e.Delta / 2 / delta;
-            tmpH = viewbox.ActualHeight + e.Delta / delta;
+            double ct = Application.Current.MainWindow.Top;
+            double cw = Application.Current.MainWindow.Width;
+            double cl = Application.Current.MainWindow.Left;
+            tmpT = ct - e.Delta / 2 / Delta;
+            tmpH = viewbox.ActualHeight + e.Delta / Delta;
 
-            tmpL = Application.Current.MainWindow.Left + ((Application.Current.MainWindow.Width - (image.ActualWidth / image.ActualHeight) * tmpH) / 2);
+            tmpL = cl + ((cw - (image.ActualWidth / image.ActualHeight) * tmpH) / 2);
             tmpW = (image.ActualWidth / image.ActualHeight) * tmpH;
             SetBounds((int)tmpL, (int)tmpT, (int)tmpW, (int)tmpH);
         }
@@ -155,5 +146,22 @@ namespace ImageCard
             if (e.Key == Key.Escape)
                 Close();
         }
+
+        [DllImport("user32")]
+        private static extern IntPtr DeferWindowPos(
+            IntPtr hWinPosInfo,
+            IntPtr hWnd,
+            IntPtr hWndInsertAfter,
+            int x,
+            int y,
+            int cx,
+            int cy,
+            uint uFlags);
+        [DllImport("user32")]
+        private static extern IntPtr BeginDeferWindowPos(
+            int nNumWindows);
+        [DllImport("user32")]
+        private static extern IntPtr EndDeferWindowPos(
+            IntPtr hWinPosInfo);
     }
 }

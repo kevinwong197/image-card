@@ -31,7 +31,7 @@
     </Window.Resources>
 
     <Viewbox x:Name="viewbox" Stretch="Uniform">
-        <Image x:Name="image" HorizontalAlignment="Left" Height="auto" VerticalAlignment="Top" Width="auto" Loaded="image_Loaded" >
+        <Image x:Name="image" HorizontalAlignment="Left" Height="auto" VerticalAlignment="Top" Width="auto" Loaded="Image_Loaded" >
         </Image>
     </Viewbox>
 
