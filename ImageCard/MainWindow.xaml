@@ -5,8 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ImageCard"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        WindowStyle="None"
+        WindowState="Normal" 
+        ResizeMode="CanResize"
+        AllowDrop="true"
+        HorizontalAlignment="Center" VerticalAlignment="Center"
+        Title="ImageCard"
+        Height="auto"
+        Width="auto"
+        MouseDown="Window_MouseDown"
+        Drop="Window_Drop"
+        PreviewMouseWheel="Window_PreviewMouseWheel"
+        KeyDown="Window_KeyDown">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome 
+        CaptionHeight="0"
+        ResizeBorderThickness="5" />
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <Style TargetType="Image">
+            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality" />
+        </Style>
+    </Window.Resources>
+
+    <Viewbox x:Name="viewbox" Stretch="Uniform">
+        <Image x:Name="image" HorizontalAlignment="Left" Height="auto" VerticalAlignment="Top" Width="auto" Loaded="image_Loaded" >
+        </Image>
+    </Viewbox>
+
+    <Window.ContextMenu>
+        <ContextMenu>
+            <MenuItem Name="toggleFreeze" Header="freeze" Click="MenuItem_Click_toggleFreeze" />
+            <Separator />
+            <MenuItem Header="exit" Click="MenuItem_Click_Exit" />
+        </ContextMenu>
+    </Window.ContextMenu>
 </Window>
