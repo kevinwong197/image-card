@@ -1,17 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Media.Animation;
 
 using System.IO;
 using System.Windows.Interop;
@@ -37,12 +27,8 @@ namespace ImageCard
             {
                 Uri uri = new Uri(Path.GetFullPath(args[1]));
                 bitmap = new BitmapImage(uri);
+                image.Source = bitmap;
             }
-            else
-            {
-                bitmap = new BitmapImage(new Uri(@"images\init.png", UriKind.Relative));
-            }
-            image.Source = bitmap;
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -51,7 +37,7 @@ namespace ImageCard
                 return;
             if (e.ChangedButton == MouseButton.Left)
             {
-                this.DragMove();
+                DragMove();
             }
 
             if (e.ChangedButton == MouseButton.Middle)
@@ -85,8 +71,6 @@ namespace ImageCard
             }
         }
 
-        private void 
-
         private void Window_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -106,7 +90,6 @@ namespace ImageCard
         {
             Application.Current.MainWindow.Height = viewbox.ActualHeight;
             Application.Current.MainWindow.Width = viewbox.ActualWidth;
-
         }
 
         private IntPtr _handle;
